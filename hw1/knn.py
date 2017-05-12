@@ -49,12 +49,12 @@ samples_per_class = 7
 # In[ ]:
 
 # Subsample the data for more efficient code execution in this exercise
-num_training = 5000
+num_training = 500
 mask = list(range(num_training))
 X_train = X_train[mask]
 y_train = y_train[mask]
 
-num_test = 500
+num_test = 50
 mask = list(range(num_test))
 X_test = X_test[mask]
 y_test = y_test[mask]
@@ -95,25 +95,23 @@ classifier.train(X_train, y_train)
 
 # Test your implementation:
 
-# start = time.time()
-# dists = classifier.compute_distances_two_loops(X_test)
-# print(dists.shape)
-# end = time.time()
-# print('double-loop execution time', (end - start))
-#
-# start = time.time()
-# dists = classifier.compute_distances_one_loop(X_test)
-# print(dists.shape)
-# end = time.time()
-# print('single-loop execution time', (end - start))
+start = time.time()
+dists = classifier.compute_distances_two_loops(X_test)
+print(dists.shape)
+end = time.time()
+print('double-loop execution time', (end - start))
+
+start = time.time()
+dists = classifier.compute_distances_one_loop(X_test)
+print(dists.shape)
+end = time.time()
+print('single-loop execution time', (end - start))
 
 start = time.time()
 dists = classifier.compute_distances_no_loops(X_test)
 print(dists.shape)
 end = time.time()
 print('vectorized execution time', (end - start))
-
-
 
 
 # In[ ]:
@@ -124,16 +122,11 @@ plt.imshow(dists, interpolation='none')
 plt.show()
 
 
-# **Inline Question #1:** Notice the structured patterns in the distance matrix, where some rows or columns are visible brighter. (Note that with the default color scheme black indicates low distances while white indicates high distances.)
+# **Inline Question #1:** Notice the structured patterns in the distance matrix, where some rows or columns are visible brighter.
+# (Note that with the default color scheme black indicates low distances while white indicates high distances.)
 # 
 # - What in the data is the cause behind the distinctly bright rows?
 # - What causes the columns?
-
-# **Your Answer**: *fill this in.*
-# 
-# 
-
-# In[ ]:
 
 # Now implement the function predict_labels and run the code below:
 # We use k = 1 (which is Nearest Neighbor).
@@ -142,22 +135,18 @@ y_test_pred = classifier.predict_labels(dists, k=1)
 # Compute and print the fraction of correctly predicted examples
 num_correct = np.sum(y_test_pred == y_test)
 accuracy = float(num_correct) / num_test
-print('Got %d / %d correct => accuracy: %f' % (num_correct, num_test, accuracy))
+print('Using k = %d, got %d / %d correct => accuracy: %f' % (1,num_correct, num_test, accuracy))
 
 
 # You should expect to see approximately `27%` accuracy. Now lets try out a larger `k`, say `k = 5`:
 
-# In[ ]:
-
 y_test_pred = classifier.predict_labels(dists, k=5)
 num_correct = np.sum(y_test_pred == y_test)
 accuracy = float(num_correct) / num_test
-print('Got %d / %d correct => accuracy: %f' % (num_correct, num_test, accuracy))
+print('Using k = %d, got %d / %d correct => accuracy: %f' % (5, num_correct, num_test, accuracy))
 
 
 # You should expect to see a slightly better performance than with `k = 1`.
-
-# In[ ]:
 
 # Now lets speed up distance matrix computation by using partial vectorization
 # with one loop. Implement the function compute_distances_one_loop and run the
@@ -173,12 +162,10 @@ dists_one = classifier.compute_distances_one_loop(X_test)
 difference = np.linalg.norm(dists - dists_one, ord='fro')
 print('Difference was: %f' % (difference, ))
 if difference < 0.001:
-    print('Good! The distance matrices are the same')
+    print('Good! The distance matrices are the same for double-loop vs single-loop')
 else:
-    print('Uh-oh! The distance matrices are different')
+    print('Uh-oh! The distance matrices are different for double-loop vs single-loop')
 
-
-# In[ ]:
 
 # Now implement the fully vectorized version inside compute_distances_no_loops
 # and run the code
@@ -188,12 +175,9 @@ dists_two = classifier.compute_distances_no_loops(X_test)
 difference = np.linalg.norm(dists - dists_two, ord='fro')
 print('Difference was: %f' % (difference, ))
 if difference < 0.001:
-    print('Good! The distance matrices are the same')
+    print('Good! The distance matrices are the same for single-loop vs vectorized')
 else:
-    print('Uh-oh! The distance matrices are different')
-
-
-# In[ ]:
+    print('Uh-oh! The distance matrices are different for single-loop vs vectorized')
 
 # Let's compare how fast the implementations are
 def time_function(f, *args):
@@ -214,15 +198,11 @@ print('One loop version took %f seconds' % one_loop_time)
 
 no_loop_time = time_function(classifier.compute_distances_no_loops, X_test)
 print('No loop version took %f seconds' % no_loop_time)
-
 # you should see significantly faster performance with the fully vectorized implementation
 
-
 # ### Cross-validation
-# 
-# We have implemented the k-Nearest Neighbor classifier but we set the value k = 5 arbitrarily. We will now determine the best value of this hyperparameter with cross-validation.
-
-# In[ ]:
+# We have implemented the k-Nearest Neighbor classifier but we set the value k = 5 arbitrarily.
+# We will now determine the best value of this hyperparameter with cross-validation.
 
 num_folds = 5
 k_choices = [1, 3, 5, 8, 10, 12, 15, 20, 50, 100]
@@ -236,10 +216,8 @@ y_train_folds = []
 # y_train_folds[i] is the label vector for the points in X_train_folds[i].     #
 # Hint: Look up the numpy array_split function.                                #
 ################################################################################
-pass
-################################################################################
-#                                 END OF YOUR CODE                             #
-################################################################################
+X_train_folds = np.array_split(X_train, num_folds)
+y_train_folds = np.array_split(y_train, num_folds)
 
 # A dictionary holding the accuracies for different values of k that we find
 # when running cross-validation. After running cross-validation,
@@ -256,10 +234,21 @@ k_to_accuracies = {}
 # last fold as a validation set. Store the accuracies for all fold and all     #
 # values of k in the k_to_accuracies dictionary.                               #
 ################################################################################
-pass
-################################################################################
-#                                 END OF YOUR CODE                             #
-################################################################################
+for k in k_choices:
+    k_to_accuracies[k] = 0
+    for test_fold in range(num_folds):
+        r = np.hstack((np.array(range(test_fold)), np.array(range(test_fold + 1, num_folds))))
+        X_test = X_train_folds[test_fold]
+        y_test = y_train_folds[test_fold]
+
+        X_train = np.vstack(np.array(X_train_folds[r]))
+        y_train = np.vstack(np.array(y_train_folds[r]))
+        classifier.train(X_train, y_train)
+        y_test_predicted = classifier.predict(X_test, k = k)
+        k_to_accuracies[k] += sum(y_test_predicted, y_test) * 1.0 / len(y_test)
+    k_to_accuracies[k] /= num_folds
+
+
 
 # Print out the computed accuracies
 for k in sorted(k_to_accuracies):

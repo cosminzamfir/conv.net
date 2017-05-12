@@ -35,6 +35,8 @@ def svm_loss_naive(W, X, y, reg):
       margin = scores[j] - correct_class_score + 1 # note delta = 1
       if margin > 0:
         loss += margin
+        #if margin>0, the derivatives of the j columns of W relative to exaample i are exactly the X[i] values
+        dW[:,j] += X[i]
 
   # Right now the loss is a sum over all training examples, but we want it
   # to be an average instead so we divide by num_train.
@@ -42,6 +44,8 @@ def svm_loss_naive(W, X, y, reg):
 
   # Add regularization to the loss.
   loss += reg * np.sum(W * W)
+  # Add regularization gradient to the gradient
+  dW += 2 * W
 
   #############################################################################
   # TODO:                                                                     #
@@ -54,7 +58,6 @@ def svm_loss_naive(W, X, y, reg):
 
 
   return loss, dW
-
 
 def svm_loss_vectorized(W, X, y, reg):
   """
@@ -70,11 +73,11 @@ def svm_loss_vectorized(W, X, y, reg):
   # Implement a vectorized version of the structured SVM loss, storing the    #
   # result in loss.                                                           #
   #############################################################################
-  pass
-  #############################################################################
-  #                             END OF YOUR CODE                              #
-  #############################################################################
-
+  scores = np.matmul(X,W)
+  true_category_scores = scores[np.arange(len(scores)), y]
+  diffs = np.sum(scores, - true_category_scores) + 1
+  diffs[diffs < 0] = 0
+  return np.sum(diffs) - len(y) #substract N to cancel the overcount of including the true category in the sum
 
   #############################################################################
   # TODO:                                                                     #
@@ -85,9 +88,8 @@ def svm_loss_vectorized(W, X, y, reg):
   # to reuse some of the intermediate values that you used to compute the     #
   # loss.                                                                     #
   #############################################################################
-  pass
-  #############################################################################
-  #                             END OF YOUR CODE                              #
-  #############################################################################
-
+  #for every non-null element [i,j] in the diffs matrix, add the i'th row of the
+  #X matrix to j'th column of the dW matrix
+  positive_diffs_indx = np.where(scores > 0)
+  dW[positive_diffs_indx[1]] += X[positive_diffs_indx[0]]
   return loss, dW
