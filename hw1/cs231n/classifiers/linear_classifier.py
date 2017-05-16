@@ -53,10 +53,9 @@ class LinearClassifier(object):
       # Hint: Use np.random.choice to generate indices. Sampling with         #
       # replacement is faster than sampling without replacement.              #
       #########################################################################
-      pass
-      #########################################################################
-      #                       END OF YOUR CODE                                #
-      #########################################################################
+      sample_idxs = np.random.choice(np.arange(num_train), batch_size)
+      X_batch = X[sample_idxs]
+      y_batch = y[sample_idxs]
 
       # evaluate loss and gradient
       loss, grad = self.loss(X_batch, y_batch, reg)
@@ -67,10 +66,7 @@ class LinearClassifier(object):
       # TODO:                                                                 #
       # Update the weights using the gradient and the learning rate.          #
       #########################################################################
-      pass
-      #########################################################################
-      #                       END OF YOUR CODE                                #
-      #########################################################################
+      self.W -= grad * learning_rate
 
       if verbose and it % 100 == 0:
         print('iteration %d / %d: loss %f' % (it, num_iters, loss))

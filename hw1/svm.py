@@ -210,7 +210,7 @@ print('Vectorized loss and gradient: computed in %fs' % (toc - tic))
 # by the two implementations. The gradient on the other hand is a matrix, so
 # we use the Frobenius norm to compare them.
 difference = np.linalg.norm(grad_naive - grad_vectorized, ord='fro')
-print('difference: %f' % difference)
+print('difference in gradient: %f' % difference)
 
 
 # ### Stochastic Gradient Descent

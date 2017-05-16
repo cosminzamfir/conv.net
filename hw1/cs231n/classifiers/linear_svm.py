@@ -35,8 +35,9 @@ def svm_loss_naive(W, X, y, reg):
       margin = scores[j] - correct_class_score + 1 # note delta = 1
       if margin > 0:
         loss += margin
-        #if margin>0, the derivatives of the j columns of W relative to exaample i are exactly the X[i] values
+        #if margin>0, we have 2 partial derivatives: with respect to w(j) and with respect to w(yi)
         dW[:,j] += X[i]
+        dW[:,y[i]] -= X[i]
 
   # Right now the loss is a sum over all training examples, but we want it
   # to be an average instead so we divide by num_train.
@@ -44,7 +45,9 @@ def svm_loss_naive(W, X, y, reg):
 
   # Add regularization to the loss.
   loss += reg * np.sum(W * W)
+
   # Add regularization gradient to the gradient
+  dW /= X.shape[0]
   dW += 2 * W * reg
 
   #############################################################################
@@ -55,8 +58,7 @@ def svm_loss_naive(W, X, y, reg):
   # loss is being computed. As a result you may need to modify some of the    #
   # code above to compute the gradient.                                       #
   #############################################################################
-
-
+  np.savetxt('c:/work/data/transfer/naive_loss.csv',dW,delimiter=',')
   return loss, dW
 
 def svm_loss_vectorized(W, X, y, reg):
@@ -73,11 +75,14 @@ def svm_loss_vectorized(W, X, y, reg):
   # Implement a vectorized version of the structured SVM loss, storing the    #
   # result in loss.                                                           #
   #############################################################################
+  N=X.shape[0]
   scores = np.matmul(X,W)
-  true_category_scores = scores[np.arange(len(scores)), y].reshape((len(y),1))
+  true_category_scores = scores[np.arange(N), y].reshape((N,1))
   diffs = scores - true_category_scores + 1
   diffs[diffs < 0] = 0
-  loss = np.sum(diffs) - len(y) #substract N to cancel the overcount of including the true category in the sum
+  diffs[np.arange(N),y] = 0 #do not count the diffs for the category = true category
+  loss = np.sum(diffs)
+  loss /= N
 
   #############################################################################
   # TODO:                                                                     #
@@ -90,6 +95,16 @@ def svm_loss_vectorized(W, X, y, reg):
   #############################################################################
   #for every non-null element [i,j] in the diffs matrix, add the i'th row of the
   #X matrix to j'th column of the dW matrix
-  positive_diffs_indx = np.where(scores > 0)
-  dW[positive_diffs_indx[1]] += X[positive_diffs_indx[0]]
+  positive_diffs_indx = np.where(diffs > 0)
+
+  #for each [example,category] in the positive_diffs_indx, add the xi's to the d'weights for that category
+  dW[:,positive_diffs_indx[1]] += np.transpose(X[positive_diffs_indx[0],:])
+
+  #for each [example,...] in the positive_diffs_indx, substract the xi's from the d'weights of the true category
+  true_categories_for_dw = y[positive_diffs_indx[0]]
+  dW[:,true_categories_for_dw] -= np.transpose(X[positive_diffs_indx[0],:])
+
+  dW /= N
+  dW += 2 * W * reg
+  np.savetxt('c:/work/data/transfer/vectorized_loss.csv',dW,delimiter=',')
   return loss, dW

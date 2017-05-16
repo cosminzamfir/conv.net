@@ -30,11 +30,25 @@ def softmax_loss_naive(W, X, y, reg):
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
-  #############################################################################
-  #                          END OF YOUR CODE                                 #
-  #############################################################################
+  N = X.shape[0]
+  C = W.shape[1]
+  for i in range(N):
+    xi = X[i]
+    yi = y[i]
+    f = np.zeros(C)
+    for j in range(C):
+      f[j] = np.sum(xi*W[:,j])
+    f = f - np.max(f)
+    loss += -f[yi] + np.log(np.sum(np.exp(f)))
 
+    for j in range(C):
+      if j != yi:
+        dW[:,j] += xi
+
+  loss /= N
+  loss += reg * np.sum(W * W)
+  dW /= N
+  dW += reg * 2 * W
   return loss, dW
 
 
