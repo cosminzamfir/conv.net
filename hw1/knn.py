@@ -49,12 +49,12 @@ samples_per_class = 7
 # In[ ]:
 
 # Subsample the data for more efficient code execution in this exercise
-num_training = 500
+num_training = 5000
 mask = list(range(num_training))
 X_train = X_train[mask]
 y_train = y_train[mask]
 
-num_test = 50
+num_test = 500
 mask = list(range(num_test))
 X_test = X_test[mask]
 y_test = y_test[mask]
@@ -136,16 +136,12 @@ y_test_pred = classifier.predict_labels(dists, k=1)
 num_correct = np.sum(y_test_pred == y_test)
 accuracy = float(num_correct) / num_test
 print('Using k = %d, got %d / %d correct => accuracy: %f' % (1,num_correct, num_test, accuracy))
-
-
 # You should expect to see approximately `27%` accuracy. Now lets try out a larger `k`, say `k = 5`:
 
 y_test_pred = classifier.predict_labels(dists, k=5)
 num_correct = np.sum(y_test_pred == y_test)
 accuracy = float(num_correct) / num_test
 print('Using k = %d, got %d / %d correct => accuracy: %f' % (5, num_correct, num_test, accuracy))
-
-
 # You should expect to see a slightly better performance than with `k = 1`.
 
 # Now lets speed up distance matrix computation by using partial vectorization

@@ -120,8 +120,8 @@ class KNearestNeighbor(object):
         # HINT: Try to formulate the l2 distance using matrix multiplication    #
         #       and two broadcast sums.                                         #
         #########################################################################
-        # squared L2 distance between u and v can be written as: L2(u,v) = (u1-v1)^2 + (u2-v2)^2 = ... = u*u + v*v - 2*u*v
-        # => X*t(X) contains u^2; X_train*t(X_train contains) v^2; X*t(X_train) contains u*v
+        # squared L2 distance between u and v can be written as: L2(u,v) = (u1-v1)^2 + (u2-v2)^2 + ... + (un-vn)^2 = u*u + v*v - 2*u*v
+        # which in our case is X*t(X) + X_train*t(X_train) - 2*X*t(X_train)
         test_dot_test = np.sum(X*X,axis=1)
         train_dot_train = np.sum(self.X_train * self.X_train, axis=1)
         test_dot_train = np.matmul(X, np.transpose(self.X_train))
@@ -152,7 +152,6 @@ class KNearestNeighbor(object):
         # Hint: Look up the function numpy.argsort.                             #
         #########################################################################
         sorted_idx = np.argsort(dists)
-        # sorted_dists = dists[np.arange(num_test).reshape(num_test,1), sort_idx]
         closest_idx = sorted_idx[:, 0:k]
         closest_y = self.y_train[np.ndarray.flatten(closest_idx)].reshape((num_test, k))
 
