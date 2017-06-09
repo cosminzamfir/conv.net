@@ -45,7 +45,7 @@ public class SkillApp {
 	public static void main(String[] args) {
 		if (args.length == 0) {
 			System.err.println("Usage: java SkillApp <file_name>, where file_name is a text file with the structure\n"
-					+ "#Skills-any number of lines: Skill:<name>,<aquisitionCost> \n"
+					+ "#Skills-any number of lines: Skill:<name>,<cost> \n"
 					+ "#Resources-any number of lines: Resource:<resourceName>,<comma separated list of skills> \n"
 					+ "#Target-any number of lines: Target:<skillName>,<amount> \n"
 					+ "#Transformations-any number of lines: Transformation:<originSkillName,targetSkillName,cost>");
