@@ -2,6 +2,7 @@ package hr;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,11 +45,7 @@ public class SkillApp {
 
 	public static void main(String[] args) {
 		if (args.length == 0) {
-			System.err.println("Usage: java SkillApp <file_name>, where file_name is a text file with the structure\n"
-					+ "#Skills-any number of lines: Skill:<name>,<cost> \n"
-					+ "#Resources-any number of lines: Resource:<resourceName>,<comma separated list of skills> \n"
-					+ "#Target-any number of lines: Target:<skillName>,<amount> \n"
-					+ "#Transformations-any number of lines: Transformation:<originSkillName,targetSkillName,cost>");
+			System.err.println("Usage: java SkillApp <input_file_name>");
 			System.exit(-1);
 		}
 		String fileName = args[0];
@@ -68,6 +65,9 @@ public class SkillApp {
 		BufferedReader reader = null;
 		try {
 			File file = new File(fileName);
+			if(!file.exists()) {
+				throw new FileNotFoundException(fileName);
+			}
 			reader = new BufferedReader(new FileReader(file));
 			String line = null;
 			while ((line = reader.readLine()) != null) {
@@ -93,7 +93,7 @@ public class SkillApp {
 		} finally {
 			try {
 				reader.close();
-			} catch (IOException ignore) {
+			} catch (Exception ignore) {
 			}
 		}
 	}
@@ -180,19 +180,24 @@ public class SkillApp {
 		while (resourceIter.hasNext()) {
 			Resource resource = resourceIter.next();
 			SkillInstance targetSkill = null;
-			double minCost = Double.POSITIVE_INFINITY;
+			double maxSaving = 0;
+			double assignmentCost = 0;
 			for (SkillInstance skillInstance : uncovered) {
 				double cost = assignmentCost(resource, skillInstance);
-				if (cost < minCost) {
+				double saving = skillInstance.getCost() - cost;
+				if (saving > maxSaving) {
 					targetSkill = skillInstance;
-					minCost = cost;
+					maxSaving = saving;
+					assignmentCost = cost;
 				}
 			}
-			if (minCost < Double.POSITIVE_INFINITY) {
+			if (maxSaving > 0) {
 				uncovered.remove(targetSkill);
-				ResourceAssignment ass = new ResourceAssignment(resource, targetSkill, minCost);
+				ResourceAssignment ass = new ResourceAssignment(resource, targetSkill, assignmentCost);
 				covered.add(ass);
-				System.out.println("Created assignment " + ass + "; New cost: " + totalCost());
+				System.out.println("Created assignment " + ass + 
+						";Saving: " + maxSaving + 
+						"; New cost: " + totalCost());
 				availableResources.remove(resource);
 			}
 

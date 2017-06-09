@@ -1,7 +1,7 @@
-#Skills-any number of lines: Skill:<name>,<cost>
-#Resources-any number of lines: Resource:<resourceName>,<comma separated list of skills>
-#Target-any number of lines: Target:<skillName>,<amount>
-#Transformations-any number of lines: Transformation:<originSkillName,targetSkillName,cost>
+#Skills: Skill:<name>,<cost>
+#Resources: Resource:<resourceName>,<comma separated list of skills>
+#Target: Target:<skillName>,<amount>
+#Transformations: Transformation:<originSkillName,targetSkillName,cost>
 
 Skill:Java,1000
 Skill:ProjectManagement,800
@@ -12,27 +12,27 @@ Skill:OracleAdmin,1500
 Resource:Sorin,ProjectManagement
 Resource:Cosmin,Java,Python,ProjectManagement
 Resource:Cezar,Security,Python
-Resource:Michael,OracleAdmin
+Resource:Prince,OracleAdmin
 
 Resource:Sorin1,ProjectManagement
 Resource:Cosmin1,Java,Python,ProjectManagement
 Resource:Cezar1,Security,Python
-Resource:Michael1,OracleAdmin
+Resource:Prince1,OracleAdmin
 
 Resource:Sorin2,ProjectManagement
 Resource:Cosmin2,Java,Python,ProjectManagement
 Resource:Cezar2,Security,Python
-Resource:Michael2,OracleAdmin
+Resource:Prince2,OracleAdmin
 
 Resource:Sorin3,ProjectManagement
 Resource:Cosmin3,Java,Python,ProjectManagement
 Resource:Cezar3,Security,Python
-Resource:Michael3,OracleAdmin
+Resource:Prince3,OracleAdmin
 
 Target:Java,5
 Target:ProjectManagement,2
 Target:Python,10
-Target:Security,1
+Target:Security,10
 
 Transformation:Java,Python,100
 Transformation:Python,Java,200
