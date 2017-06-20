@@ -11,6 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class SkillApp {
 
 	private class DoubleHolder {
@@ -35,13 +37,16 @@ public class SkillApp {
 	private static final String TARGET = "Target:";
 	private static final String TRANSFORMATION = "Transformation:";
 	private static final String RESOURCE = "Resource:";
+	private static final String INPUT_FILE = "/home/cosmin/data/stan_cnn/test/res/input.json";
 
 	private List<Resource> resources = new ArrayList<>();
+	private List<Skill> skills = new ArrayList<>();
 	private List<SkillInstance> target = new ArrayList<>();
 	private Transformations transformations = Transformations.instance();
 	private List<ResourceAssignment> covered = new ArrayList<>();
 	private List<SkillInstance> uncovered = new ArrayList<>();
 	private List<Resource> availableResources;
+	private Input input;
 
 	public static void main(String[] args) {
 		if (args.length == 0) {
@@ -87,7 +92,8 @@ public class SkillApp {
 			}
 			availableResources = new ArrayList<>(resources);
 			uncovered = new ArrayList<>(target);
-
+			input = new Input(this.skills, this.resources, this.target, this.transformations.getTransformations());
+			writeJson(input);
 		} catch (Exception e) {
 			throw new RuntimeException("Error loading file " + fileName, e);
 		} finally {
@@ -98,9 +104,22 @@ public class SkillApp {
 		}
 	}
 
+	private void writeJson(Input input) {
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			mapper.writerWithDefaultPrettyPrinter().writeValue(new File(INPUT_FILE), input);
+			Input obj = mapper.readValue(new File(INPUT_FILE), Input.class);
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			throw new RuntimeException("Error in json", e);
+		}
+	}
+
 	private void parseSkill(String s) {
 		String[] tokens = parse(s, 2);
-		Skill.instance(tokens[0], Double.valueOf(tokens[1]));
+		this.skills.add(Skill.instance(tokens[0], Double.valueOf(tokens[1])));
+		
 	}
 
 	private void parseResource(String s) {
@@ -170,13 +189,17 @@ public class SkillApp {
 		return res.toString();
 	}
 
-	public void process() {
+	public String process() {
+		Output res = new Output();
 		System.out.println("Processing. Initial cost: " + totalCost() + " ...");
 		Iterator<Resource> resourceIter = resources.iterator();
+		
 		if (uncovered.isEmpty()) {
 			System.out.println("Done.");
-			return;
+			res.setAvailableResources(this.availableResources);
+			return getJsonString(res);
 		}
+		
 		while (resourceIter.hasNext()) {
 			Resource resource = resourceIter.next();
 			SkillInstance targetSkill = null;
@@ -194,15 +217,22 @@ public class SkillApp {
 			if (maxSaving > 0) {
 				uncovered.remove(targetSkill);
 				ResourceAssignment ass = new ResourceAssignment(resource, targetSkill, assignmentCost);
+				res.addAssignment(ass);
 				covered.add(ass);
 				System.out.println("Created assignment " + ass + 
 						";Saving: " + maxSaving + 
 						"; New cost: " + totalCost());
 				availableResources.remove(resource);
+				res.setAvailableResources(this.availableResources);
+				res.setUncoveredSkills(this.uncovered);
 			}
 
 		}
 		System.out.println("Done");
+		String json = getJsonString(res);
+		System.out.println("Json output:\n");
+		System.out.println(json);
+		return json;
 	}
 
 	private double totalCost() {

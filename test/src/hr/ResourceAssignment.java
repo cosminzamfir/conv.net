@@ -6,6 +6,11 @@ public class ResourceAssignment {
 	private SkillInstance skill;
 	private double cost;
 
+	
+	public ResourceAssignment() {
+		super();
+	}
+
 	public ResourceAssignment(Resource resource, SkillInstance skill, double cost) {
 		super();
 		this.resource = resource;

@@ -9,6 +9,11 @@ public class Skill {
 	private double cost;
 	private static Map<String, Skill> all = new LinkedHashMap<>();
 
+	
+	public Skill() {
+		super();
+	}
+
 	private Skill(String name, double cost) {
 		super();
 		this.name = name;

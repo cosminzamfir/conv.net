@@ -1,9 +1,15 @@
 package hr;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class SkillInstance {
 
 	private Skill skill;
 
+	
+	public SkillInstance() {
+		super();
+	}
 	public static SkillInstance instance(Skill skill) {
 		return new SkillInstance(skill);
 	}
@@ -23,6 +29,8 @@ public class SkillInstance {
 	public String toString() {
 		return skill.toString();
 	}
+	
+	@JsonIgnore
 	public double getCost() {
 		return skill.getCost();
 	}

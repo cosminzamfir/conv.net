@@ -36,4 +36,8 @@ public class Transformations {
 		return res.toString();
 	}
 	
+	public List<Transformation> getTransformations() {
+		return transformations;
+	}
+	
 }

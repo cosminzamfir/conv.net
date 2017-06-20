@@ -6,6 +6,11 @@ public class Transformation {
 	private Skill target;
 	private double cost;
 
+	
+	public Transformation() {
+		super();
+	}
+
 	private Transformation(Skill origin, Skill target, double cost) {
 		super();
 		this.origin = origin;

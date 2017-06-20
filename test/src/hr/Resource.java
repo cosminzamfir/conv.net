@@ -11,6 +11,11 @@ public class Resource {
 	private List<Skill> skills = new ArrayList<>();
 	private static Map<String, Resource> all = new LinkedHashMap<>();
 
+	
+	public Resource() {
+		super();
+	}
+
 	public static Resource instance(String name, String ... skills) {
 		Resource res = new Resource(name, skills);
 		all.put(res.getName(), res);
